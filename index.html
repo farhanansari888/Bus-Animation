@@ -1,59 +1,327 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="hi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Animated Bus — Click to Start</title>
-<style>
-  :root{ --bg:#cfe9ff; --road:#3b3b3b; --bus:#ffcc00; }
-  *{box-sizing:border-box}
-  body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(#87cefa,#cfe9ff); font-family:Inter, system-ui, Arial }
-  .stage{ width:100%; max-width:900px; height:360px; background:transparent; border-radius:12px; position:relative; overflow:hidden; padding:20px }/* road */ .road{ position:absolute; left:0; right:0; bottom:40px; height:100px; background:linear-gradient(#3b3b3b,#2f2f2f); border-top-left-radius:40px; border-top-right-radius:40px; box-shadow:0 -6px 20px rgba(0,0,0,.15) inset } .lane{ position:absolute; left:0; right:0; top:50%; height:4px; background:linear-gradient(90deg,#fff0,#fff,#fff0); opacity:.7; transform:translateY(-50%); background-size:40px 4px; background-repeat:repeat-x }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 60%, #90EE90 60%, #90EE90 100%);
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-/* bus wrapper (animated) / .bus-wrap{ position:absolute; left:-260px; bottom:92px; width:260px; height:90px; pointer-events:none; / paused by default */ animation: drive 6s linear infinite paused; will-change: transform; }
+        .road {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            height: 80px;
+            background: #333;
+            border-top: 5px solid #FFF;
+            border-bottom: 5px solid #FFF;
+        }
 
-/* start animation when checkbox checked */ #go:checked ~ .stage .bus-wrap{ animation-play-state:running }
+        .road::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: repeating-linear-gradient(
+                to right,
+                #FFF 0px,
+                #FFF 30px,
+                transparent 30px,
+                transparent 60px
+            );
+            animation: roadMove 2s linear infinite;
+        }
 
-@keyframes drive{ 0%{ transform: translateX(0) translateY(0) } 50%{ transform: translateX(115%) translateY(-6px) } 100%{ transform: translateX(240%) translateY(0) } }
+        @keyframes roadMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-60px); }
+        }
 
-/* bus design using divs */ .bus{ width:100%; height:100%; position:relative; border-radius:14px; background: linear-gradient(#ffda4a, #ffbf0f); box-shadow: 0 10px 30px rgba(0,0,0,.2); border:4px solid rgba(0,0,0,.08); overflow:visible } .bus:before{ content:""; position:absolute; left:14px; top:-28px; width:120px; height:40px; border-radius:10px; background:linear-gradient(#ffd24a,#ffb800); box-shadow:0 6px 14px rgba(0,0,0,.12) } .window-row{ position:absolute; left:18px; right:18px; top:18px; height:34px; display:flex; gap:10px } .window{ flex:1; background:linear-gradient(#bfefff,#9fd9ff); border-radius:6px; border:2px solid rgba(255,255,255,.25); box-shadow: inset 0 6px 12px rgba(255,255,255,.07) } .wheel{ position:absolute; bottom:-18px; width:46px; height:46px; border-radius:50%; background:#222; left:34px; box-shadow: inset 0 -6px 10px rgba(0,0,0,.4) } .wheel.right{ right:34px; left:auto } .hub{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:50%; background:linear-gradient(#777,#333) } .headlight{ position:absolute; right:6px; bottom:20px; width:18px; height:10px; border-radius:6px; background:linear-gradient(#fff8b0,#ffd87a); box-shadow:0 6px 18px rgba(255,210,120,.25) }
+        .bus {
+            position: absolute;
+            bottom: 180px;
+            left: 50px;
+            width: 150px;
+            height: 80px;
+            transition: transform 0.5s ease;
+        }
 
-/* sun and clouds for scene */ .sun{ position:absolute; right:40px; top:30px; width:80px; height:80px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fff8a8, #ffd86a 35%, transparent 70%) } .cloud{ position:absolute; left:40px; top:40px } .cloud div{ display:inline-block; background:#fff; width:48px; height:28px; border-radius:20px; box-shadow:0 8px 18px rgba(0,0,0,.06); margin-right:-14px }
+        .bus.moving {
+            animation: busMove 3s ease-in-out forwards;
+        }
 
-/* control area */ .controls{ position:relative; z-index:20; display:flex; gap:12px; align-items:center } .btn{ cursor:pointer; padding:10px 16px; background:#0b76ff; color:#fff; border-radius:10px; font-weight:700; border:0 } .btn:active{ transform:translateY(1px) } .status{ color:#123; font-weight:700 }
+        @keyframes busMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw - 200px)); }
+        }
 
-/* hide native checkbox */ #go{ position:absolute; left:-9999px }
+        .bus-body {
+            width: 150px;
+            height: 60px;
+            background: #FF6B35;
+            border-radius: 10px;
+            position: relative;
+            border: 3px solid #333;
+        }
 
-/* responsive */ @media (max-width:540px){ .stage{height:300px} .bus-wrap{ width:200px; left:-220px } } </style>
+        .bus-windows {
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            width: 120px;
+            height: 25px;
+            background: #87CEEB;
+            border-radius: 5px;
+            border: 2px solid #333;
+        }
 
+        .bus-window-dividers {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bus-window-dividers::before,
+        .bus-window-dividers::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: #333;
+        }
+
+        .bus-window-dividers::before {
+            left: 33%;
+        }
+
+        .bus-window-dividers::after {
+            left: 66%;
+        }
+
+        .bus-door {
+            position: absolute;
+            right: 10px;
+            top: 20px;
+            width: 15px;
+            height: 35px;
+            background: #333;
+            border-radius: 3px;
+        }
+
+        .wheel {
+            position: absolute;
+            bottom: -15px;
+            width: 30px;
+            height: 30px;
+            background: #333;
+            border-radius: 50%;
+            border: 3px solid #666;
+        }
+
+        .wheel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .wheel-front {
+            left: 20px;
+        }
+
+        .wheel-back {
+            right: 20px;
+        }
+
+        .bus.moving .wheel {
+            animation: wheelRotate 0.3s linear infinite;
+        }
+
+        @keyframes wheelRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .control-panel {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .start-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #45a049;
+        }
+
+        .start-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: cloudMove 15s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+        }
+
+        .cloud1 {
+            width: 60px;
+            height: 30px;
+            top: 20%;
+            left: -60px;
+        }
+
+        .cloud1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 35px;
+            height: 35px;
+            top: -10px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 50px;
+            height: 25px;
+            top: 10%;
+            left: -50px;
+            animation-delay: -5s;
+        }
+
+        .cloud2::before {
+            width: 35px;
+            height: 35px;
+            top: -12px;
+            left: 8px;
+        }
+
+        .cloud2::after {
+            width: 30px;
+            height: 30px;
+            top: -8px;
+            right: 8px;
+        }
+
+        @keyframes cloudMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 60px)); }
+        }
+
+        .title {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-  <!-- hidden checkbox toggles the CSS animation -->
-  <input type="checkbox" id="go" />  <div class="stage">
-    <div class="sun"></div>
-    <div class="cloud" style="transform:translateY(6px)"><div></div><div></div><div></div></div><div class="bus-wrap">
-  <div class="bus">
-    <div class="window-row">
-      <div class="window"></div>
-      <div class="window"></div>
-      <div class="window"></div>
+    <div class="clouds">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
     </div>
-    <div class="wheel"><div class="hub"></div></div>
-    <div class="wheel right"><div class="hub"></div></div>
-    <div class="headlight"></div>
-  </div>
-</div>
 
-<div class="road">
-  <div class="lane"></div>
-</div>
+    <div class="control-panel">
+        <div class="title">Lo madam ji bus chala lo 🙂</div>
+        <button class="start-btn" onclick="startBus()">Bus Chalao! 🚌</button>
+    </div>
 
-<!-- controls positioned over stage bottom-left -->
-<div style="position:absolute; left:20px; bottom:14px">
-  <label class="controls" for="go">
-    <button class="btn">Start / Stop Bus</button>
-    <div class="status">Click the button to make the bus move</div>
-  </label>
-</div>
+    <div class="road"></div>
+    
+    <div class="bus" id="bus">
+        <div class="bus-body">
+            <div class="bus-windows">
+                <div class="bus-window-dividers"></div>
+            </div>
+            <div class="bus-door"></div>
+        </div>
+        <div class="wheel wheel-front"></div>
+        <div class="wheel wheel-back"></div>
+    </div>
 
-  </div></body>
-</html>
+    <script>
+        let isMoving = false;
+
+        function startBus() {
+            if (isMoving) return;
+            
+            const bus = document.getElementById('bus');
+            const btn = document.querySelector('.start-btn');
+            
+            isMoving = true;
+            btn.disabled = true;
+            btn.textContent = 'Bus Chal Rahi Hai...';
+            
+            bus.classList.add('moving');
+            
+            setTimeout(() => {
+                bus.classList.remove('moving');
+                bus.style.transform = 'translateX(0)';
+                isMoving = false;
+                btn.disabled = false;
+                btn.textContent = 'Bus Chalao! 🚌';
+            }, 3000);
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                startBus();
+            }
+        });
+    </script>
+</body>
+  </html>
